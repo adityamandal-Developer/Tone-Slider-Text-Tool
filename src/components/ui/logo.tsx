@@ -1,8 +1,6 @@
 import React from "react";
 
-type Props = {};
-
-const Logo = (props: Props) => {
+const Logo = () => {
   return <span className="cursor-pointer hover:text-destructive">TEXTIE</span>;
 };
 
