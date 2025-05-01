@@ -1,5 +1,8 @@
 import React from "react";
-import { Button } from "../ui/button";
+import ResetButton from "../ui/reset-button";
+import CopyButton from "../ui/copy-button";
+import UndoButton from "../ui/undo-button";
+import RedoButton from "../ui/redo-button";
 
 const Settings = () => {
   return (
@@ -11,22 +14,14 @@ const Settings = () => {
 
       {/* undo redo */}
       <div className="flex gap-1 w-full" id="undo-redo">
-        <Button className="grow" variant={"outline"}>
-          undo
-        </Button>
-        <Button className="grow" variant={"outline"}>
-          redo
-        </Button>
+        <UndoButton />
+        <RedoButton />
       </div>
 
       {/* reset and copy */}
       <div className="flex gap-1 " id="reset-copy">
-        <Button className="grow" variant={"outline"}>
-          reset
-        </Button>
-        <Button className="grow" variant={"outline"}>
-          copy
-        </Button>
+        <ResetButton />
+        <CopyButton />
       </div>
     </div>
   );

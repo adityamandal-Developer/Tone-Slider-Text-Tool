@@ -32,7 +32,7 @@ export default function RootLayout({
           attribute="class"
           enableSystem
           disableTransitionOnChange
-          defaultTheme="mono"
+          defaultTheme="system"
           themes={["mono", "bubblegum", "doom", "mocha"]}
         >
           {children}

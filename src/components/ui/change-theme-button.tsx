@@ -21,9 +21,9 @@ const ChangeThemeButton = () => {
           variant="default"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="justify-between"
         >
-          {theme}
+          {theme === "system" ? "change theme" : theme}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
