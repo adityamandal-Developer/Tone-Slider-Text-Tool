@@ -17,12 +17,12 @@ const Settings = () => {
   const dotRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
 
+  // Mouse event handlers
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
 
-  // Handle dragging
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || !sliderRef.current) return;
 
@@ -52,6 +52,59 @@ const Settings = () => {
     }
   };
 
+  // Touch event handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault(); // Prevent scrolling while dragging
+    setIsDragging(true);
+
+    // Move dot to initial touch position
+    if (sliderRef.current) {
+      const slider = sliderRef.current;
+      const rect = slider.getBoundingClientRect();
+      const touch = e.touches[0];
+
+      let newX = touch.clientX - rect.left;
+      let newY = touch.clientY - rect.top;
+
+      // Ensure within boundaries
+      newX = Math.max(0, Math.min(newX, rect.width));
+      newY = Math.max(0, Math.min(newY, rect.height));
+
+      setPosition({ x: newX, y: newY });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !sliderRef.current) return;
+
+    const slider = sliderRef.current;
+    const rect = slider.getBoundingClientRect();
+    const touch = e.touches[0];
+
+    let newX = touch.clientX - rect.left;
+    let newY = touch.clientY - rect.top;
+
+    // Ensure dot stays within slider boundaries
+    newX = Math.max(0, Math.min(newX, rect.width));
+    newY = Math.max(0, Math.min(newY, rect.height));
+
+    // Update position
+    setPosition({ x: newX, y: newY });
+  };
+
+  const handleTouchEnd = () => {
+    if (isDragging) {
+      const newHistory = [
+        ...dragHistory.slice(0, historyIndex + 1),
+        { ...position },
+      ];
+      setDragHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+      setIsDragging(false);
+    }
+  };
+
+  // Global event handlers for capturing mouse/touch outside
   useEffect(() => {
     const handleGlobalMouseUp = () => {
       if (isDragging) {
@@ -59,12 +112,22 @@ const Settings = () => {
       }
     };
 
+    const handleGlobalTouchEnd = () => {
+      if (isDragging) {
+        setIsDragging(false);
+      }
+    };
+
     window.addEventListener("mouseup", handleGlobalMouseUp);
+    window.addEventListener("touchend", handleGlobalTouchEnd);
+
     return () => {
       window.removeEventListener("mouseup", handleGlobalMouseUp);
+      window.removeEventListener("touchend", handleGlobalTouchEnd);
     };
   }, [isDragging]);
 
+  // Handle buttons
   const handleReset = () => {
     const newPosition = { x: 0, y: 0 };
     setPosition(newPosition);
@@ -107,18 +170,22 @@ const Settings = () => {
         ref={sliderRef}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         id="slider"
         className="grow min-h-72 border rounded-md border-ring relative"
       >
         <div
           ref={dotRef}
-          className="absolute cursor-move"
+          className="absolute cursor-move z-10"
           style={{
             left: `${position.x}px`,
             top: `${position.y}px`,
             transform: "translate(-50%, -50%)",
+            touchAction: "none", // Prevent default touch behaviors
           }}
           onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
         >
           <Dot className="w-20 h-20 text-primary" />
         </div>
