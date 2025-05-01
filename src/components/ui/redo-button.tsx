@@ -2,9 +2,7 @@ import React from "react";
 import { Button } from "./button";
 import { Redo } from "lucide-react";
 
-type Props = {};
-
-const RedoButton = (props: Props) => {
+const RedoButton = () => {
   return (
     <Button className="grow">
       <span>Redo</span>
