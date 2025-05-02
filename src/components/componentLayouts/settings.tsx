@@ -13,11 +13,84 @@ const Settings = () => {
     { x: 0, y: 0 },
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const [tonePercentages, setTonePercentages] = useState({
+    professional: 25,
+    creative: 25,
+    formal: 25,
+    casual: 25,
+  });
 
   const dotRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
 
-  // Mouse event handlers
+  // Calculate tone percentages based on position
+  const calculateTonePercentages = (x: number, y: number) => {
+    if (!sliderRef.current) return;
+
+    const slider = sliderRef.current;
+    const rect = slider.getBoundingClientRect();
+
+    // Normalize position to values between 0 and 1
+    const normalizedX = x / rect.width;
+    const normalizedY = y / rect.height;
+
+    const professionalPos = { x: 0.5, y: 0 }; // top center
+    const creativePos = { x: 1, y: 0.5 }; // right middle
+    const formalPos = { x: 0, y: 0.5 }; // left middle
+    const casualPos = { x: 0.5, y: 1 }; // bottom center
+
+    const professionalDist =
+      1 /
+      (Math.pow(normalizedX - professionalPos.x, 2) +
+        Math.pow(normalizedY - professionalPos.y, 2) +
+        0.01);
+    const creativeDist =
+      1 /
+      (Math.pow(normalizedX - creativePos.x, 2) +
+        Math.pow(normalizedY - creativePos.y, 2) +
+        0.01);
+    const formalDist =
+      1 /
+      (Math.pow(normalizedX - formalPos.x, 2) +
+        Math.pow(normalizedY - formalPos.y, 2) +
+        0.01);
+    const casualDist =
+      1 /
+      (Math.pow(normalizedX - casualPos.x, 2) +
+        Math.pow(normalizedY - casualPos.y, 2) +
+        0.01);
+
+    // Sum of all weights
+    const totalDist = professionalDist + creativeDist + formalDist + casualDist;
+
+    // Calculate percentages (0-100)
+    const professional = Math.round((professionalDist / totalDist) * 100);
+    const creative = Math.round((creativeDist / totalDist) * 100);
+    const formal = Math.round((formalDist / totalDist) * 100);
+    const casual = Math.round((casualDist / totalDist) * 100);
+
+    // Ensure total is exactly 100%
+    const total = professional + creative + formal + casual;
+    let adjustment = 100 - total;
+
+    // Adjust values to sum is 100%
+    let adjustedValues = {
+      professional,
+      creative,
+      formal,
+      casual,
+    };
+
+    // Apply adjustment to the largest value
+    const max = Math.max(professional, creative, formal, casual);
+    if (max === professional) adjustedValues.professional += adjustment;
+    else if (max === creative) adjustedValues.creative += adjustment;
+    else if (max === formal) adjustedValues.formal += adjustment;
+    else adjustedValues.casual += adjustment;
+
+    return adjustedValues;
+  };
+
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -32,12 +105,18 @@ const Settings = () => {
     let newX = e.clientX - rect.left;
     let newY = e.clientY - rect.top;
 
-    // Ensure dot stays within slider boundaries
+    //dot stays within slider boundaries
     newX = Math.max(0, Math.min(newX, rect.width));
     newY = Math.max(0, Math.min(newY, rect.height));
 
     // Update position
     setPosition({ x: newX, y: newY });
+
+    // Calculate and update tone percentages
+    const percentages = calculateTonePercentages(newX, newY);
+    if (percentages) {
+      setTonePercentages(percentages);
+    }
   };
 
   const handleMouseUp = () => {
@@ -71,6 +150,12 @@ const Settings = () => {
       newY = Math.max(0, Math.min(newY, rect.height));
 
       setPosition({ x: newX, y: newY });
+
+      // Calculate and update tone percentages
+      const percentages = calculateTonePercentages(newX, newY);
+      if (percentages) {
+        setTonePercentages(percentages);
+      }
     }
   };
 
@@ -90,6 +175,12 @@ const Settings = () => {
 
     // Update position
     setPosition({ x: newX, y: newY });
+
+    // Calculate and update tone percentages
+    const percentages = calculateTonePercentages(newX, newY);
+    if (percentages) {
+      setTonePercentages(percentages);
+    }
   };
 
   const handleTouchEnd = () => {
@@ -127,6 +218,16 @@ const Settings = () => {
     };
   }, [isDragging]);
 
+  // Initialize tone percentages on component mount
+  useEffect(() => {
+    if (sliderRef.current) {
+      const percentages = calculateTonePercentages(position.x, position.y);
+      if (percentages) {
+        setTonePercentages(percentages);
+      }
+    }
+  }, []);
+
   // Handle buttons
   const handleReset = () => {
     const newPosition = { x: 0, y: 0 };
@@ -135,6 +236,12 @@ const Settings = () => {
     const newHistory = [...dragHistory.slice(0, historyIndex + 1), newPosition];
     setDragHistory(newHistory);
     setHistoryIndex(newHistory.length - 1);
+
+    // Reset tone percentages
+    const percentages = calculateTonePercentages(0, 0);
+    if (percentages) {
+      setTonePercentages(percentages);
+    }
   };
 
   const handleCopy = () => {
@@ -151,7 +258,17 @@ const Settings = () => {
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
       setHistoryIndex(newIndex);
-      setPosition(dragHistory[newIndex]);
+      const newPosition = dragHistory[newIndex];
+      setPosition(newPosition);
+
+      // Update tone percentages for the new position
+      const percentages = calculateTonePercentages(
+        newPosition.x,
+        newPosition.y
+      );
+      if (percentages) {
+        setTonePercentages(percentages);
+      }
     }
   };
 
@@ -159,7 +276,17 @@ const Settings = () => {
     if (historyIndex < dragHistory.length - 1) {
       const newIndex = historyIndex + 1;
       setHistoryIndex(newIndex);
-      setPosition(dragHistory[newIndex]);
+      const newPosition = dragHistory[newIndex];
+      setPosition(newPosition);
+
+      // Update tone percentages for the new position
+      const percentages = calculateTonePercentages(
+        newPosition.x,
+        newPosition.y
+      );
+      if (percentages) {
+        setTonePercentages(percentages);
+      }
     }
   };
 
@@ -189,25 +316,38 @@ const Settings = () => {
         >
           <Dot className="w-20 h-20 text-primary" />
         </div>
-        <div className="grid grid-cols-2 min-h-72">
-          <div className="flex items-center justify-center w-full border border-ring text-center">
-            Creative
-          </div>
-          <div className="flex items-center justify-center w-full border border-ring text-center">
+        <div className="grid grid-cols-3 min-h-72">
+          <div className="flex items-center justify-center w-full border border-ring text-center"></div>
+          <div className="flex items-center justify-center w-full border border-ring text-center text-wrap">
             Professional
           </div>
-          <div className="flex items-center justify-center w-full border border-ring text-center">
+          <div className="flex items-center justify-center w-full border border-ring text-center"></div>
+          <div className="flex items-center justify-center w-full border border-ring text-center text-wrap">
             Formal
           </div>
-          <div className="flex items-center justify-center w-full border border-ring text-center">
+          <div className="flex items-center justify-center w-full border border-ring text-center"></div>
+          <div className="flex items-center justify-center w-full border border-ring text-center text-wrap">
+            Creative
+          </div>
+          <div className="flex items-center justify-center w-full border border-ring text-center"></div>
+          <div className="flex items-center justify-center w-full border border-ring text-center text-wrap">
             Casual
           </div>
+          <div className="flex items-center justify-center w-full border border-ring text-center"></div>
         </div>
       </div>
 
-      {/* Current coordinates */}
+      {/* Current coordinates and percentages */}
       <div className="text-sm text-gray-600 text-center">
-        x: {Math.round(position.x)}, y: {Math.round(position.y)}
+        <div>
+          x: {Math.round(position.x)}, y: {Math.round(position.y)}
+        </div>
+        <div className="flex flex-wrap justify-center gap-x-4 mt-1">
+          <span>Professional: {tonePercentages.professional}%</span>
+          <span>Creative: {tonePercentages.creative}%</span>
+          <span>Formal: {tonePercentages.formal}%</span>
+          <span>Casual: {tonePercentages.casual}%</span>
+        </div>
       </div>
 
       {/* undo redo */}
@@ -218,7 +358,7 @@ const Settings = () => {
 
       {/* reset and copy */}
       <div className="flex gap-1" id="reset-copy">
-        <ResetButton />
+        <ResetButton onClick={handleReset} />
         <CopyButton />
       </div>
     </div>
