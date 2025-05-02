@@ -110,7 +110,7 @@ const router = express.Router()
 
 router.post('/tone-changes', async (req, res, next) => {
 
-    if (!req?.body?.model || !req?.body?.messages || !req?.body.tone) {
+    if (!req?.body?.model || !req?.body?.messages || !req?.body?.messages[0]?.role || !req?.body?.messages[0]?.content || !req?.body?.tone) {
         return res.status(400).json({ success: false, message: 'All fields required' })
     }
     const data = await mistralResponse(handlePrompts(req.body, messagesWithTones(req.body.tone)))
@@ -119,7 +119,7 @@ router.post('/tone-changes', async (req, res, next) => {
         res.status(400)
         return next(new Error("something went wrong Mistral AI"))
     }
-    res.send({ message: 'working', body: data })
+    res.send({ message: data.choices[0].message.content, data: data })
 })
 
 export default router
