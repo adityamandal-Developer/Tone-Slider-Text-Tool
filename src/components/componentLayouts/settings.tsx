@@ -1,10 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import ResetButton from "../ui/reset-button";
-import CopyButton from "../ui/copy-button";
-import UndoButton from "../ui/undo-button";
-import RedoButton from "../ui/redo-button";
-import { Dot } from "lucide-react";
+import SettingsButton from "../ui/settings-button";
+import { Copy, Dot, Redo, RefreshCcw, Undo } from "lucide-react";
 
 const Settings = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -71,10 +68,10 @@ const Settings = () => {
 
     // Ensure total is exactly 100%
     const total = professional + creative + formal + casual;
-    let adjustment = 100 - total;
+    const adjustment = 100 - total;
 
     // Adjust values to sum is 100%
-    let adjustedValues = {
+    const adjustedValues = {
       professional,
       creative,
       formal,
@@ -338,7 +335,7 @@ const Settings = () => {
       </div>
 
       {/* Current coordinates and percentages */}
-      <div className="text-sm text-gray-600 text-center">
+      <div className="text-sm text-accent text-center">
         <div>
           x: {Math.round(position.x)}, y: {Math.round(position.y)}
         </div>
@@ -352,14 +349,18 @@ const Settings = () => {
 
       {/* undo redo */}
       <div className="flex gap-1 w-full" id="undo-redo">
-        <UndoButton />
-        <RedoButton />
+        <SettingsButton label="Undo" icon={<Undo />} />
+        <SettingsButton label="redo" icon={<Redo />} />
       </div>
 
       {/* reset and copy */}
       <div className="flex gap-1" id="reset-copy">
-        <ResetButton onClick={handleReset} />
-        <CopyButton />
+        <SettingsButton
+          label="reset"
+          icon={<RefreshCcw />}
+          onClick={handleReset}
+        />
+        <SettingsButton label="copy" icon={<Copy />} />
       </div>
     </div>
   );
