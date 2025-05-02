@@ -39,7 +39,6 @@ const ChangeThemeButton = () => {
                     setValue(currentValue === value ? "" : currentValue);
                     setOpen(false);
                     setTheme(theme);
-                    console.log(theme);
                   }}
                 >
                   {theme}
