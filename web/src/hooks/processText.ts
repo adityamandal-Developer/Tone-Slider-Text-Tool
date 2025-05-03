@@ -1,5 +1,5 @@
 "use client";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useTonePercentage } from "@/components/componentLayouts/text-editor-layout";
 import { useMutation } from "@tanstack/react-query";
 
