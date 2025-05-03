@@ -23,7 +23,7 @@ const ChangeThemeButton = () => {
           aria-expanded={open}
           className="justify-between"
         >
-          {theme === "system" ? "change theme" : theme}
+          {theme === "system" || "mono" ? "change theme" : theme}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>

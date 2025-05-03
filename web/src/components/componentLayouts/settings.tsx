@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import SettingsButton from "../ui/settings-button";
 import { Copy, Dot, Redo, RefreshCcw, Undo } from "lucide-react";
+import { useTonePercentage } from "./text-editor-layout";
 
 const Settings = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -287,6 +288,11 @@ const Settings = () => {
     }
   };
 
+  const { setTonePercentage } = useTonePercentage();
+  useEffect(() => {
+    const toneString = `${tonePercentages.professional}% professional, ${tonePercentages.creative}% creative, ${tonePercentages.formal}% formal, ${tonePercentages.casual}% casual`;
+    setTonePercentage(toneString);
+  }, [tonePercentages, setTonePercentage]);
   return (
     <div className="w-full h-full lg:w-1/3 p-2 flex flex-col gap-1">
       {/* slider */}

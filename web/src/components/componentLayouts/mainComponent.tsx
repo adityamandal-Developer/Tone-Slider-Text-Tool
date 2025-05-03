@@ -6,7 +6,7 @@ type Props = {
 
 const mainComponent = ({ children }: Props) => {
   return (
-    <main className="min-h-screen flex flex-col gap-2 bg-background p-4 lg:p-16 text-foreground border rounded-md border-ring">
+    <main className="min-h-screen h-full flex flex-col gap-2 bg-background p-4 lg:p-16 text-foreground border rounded-md border-ring">
       {children}
     </main>
   );
