@@ -202,9 +202,6 @@ const Settings = () => {
 
       {/* Current coordinates and percentages */}
       <div className="text-sm text-accent text-center">
-        <div>
-          x: {Math.round(position.x)}, y: {Math.round(position.y)}
-        </div>
         <div className="flex flex-wrap justify-center gap-x-4 mt-1">
           <span>Professional: {tonePercentages.professional}%</span>
           <span>Creative: {tonePercentages.creative}%</span>
