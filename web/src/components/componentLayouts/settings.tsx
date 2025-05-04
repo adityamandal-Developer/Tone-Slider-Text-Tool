@@ -215,16 +215,6 @@ const Settings = () => {
           <div className="flex items-center justify-center w-full border border-ring text-center"></div>
         </div>
       </div>
-
-      {/* Current coordinates and percentages */}
-      <div className="text-sm text-accent text-center">
-        <div className="flex flex-wrap justify-center gap-x-4 mt-1">
-          <span>Professional: {tonePercentages.professional}%</span>
-          <span>Creative: {tonePercentages.creative}%</span>
-          <span>Formal: {tonePercentages.formal}%</span>
-          <span>Casual: {tonePercentages.casual}%</span>
-        </div>
-      </div>
     </div>
   );
 };
