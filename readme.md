@@ -79,3 +79,8 @@ The `NEXT_PUBLIC_API_BASE_URL` in the `web/.env` file is currently set to `http:
 ## Concurrent Development
 
 **RUN BOTH WEB AND BACKEND simultaneously**
+
+# Performance
+
+
+![Screenshot 2025-05-05 033548](https://github.com/user-attachments/assets/67c69e34-b9f6-4f3b-9927-874745fc0884)
