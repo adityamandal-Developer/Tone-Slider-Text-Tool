@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
 import TanstackProvider from "@/providers/tanstack-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +37,10 @@ export default function RootLayout({
           defaultTheme="system"
           themes={["mono", "bubblegum", "doom", "mocha"]}
         >
-          <TanstackProvider>{children}</TanstackProvider>
+          <TanstackProvider>
+            {children}
+            <Toaster />
+          </TanstackProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,17 +1,12 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import SettingsButton from "../ui/settings-button";
-import { Copy, Dot, Redo, RefreshCcw, Undo } from "lucide-react";
+import { Dot } from "lucide-react";
 import { useTonePercentage } from "./text-editor-layout";
 import { calculateTonePercentages } from "@/lib/calculateTone";
 
 const Settings = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [dragHistory, setDragHistory] = useState<{ x: number; y: number }[]>([
-    { x: 0, y: 0 },
-  ]);
-  const [historyIndex, setHistoryIndex] = useState(0);
   const [tonePercentages, setTonePercentages] = useState({
     professional: 25,
     creative: 25,
@@ -54,12 +49,6 @@ const Settings = () => {
 
   const handleMouseUp = () => {
     if (isDragging) {
-      const newHistory = [
-        ...dragHistory.slice(0, historyIndex + 1),
-        { ...position },
-      ];
-      setDragHistory(newHistory);
-      setHistoryIndex(newHistory.length - 1);
       setIsDragging(false);
     }
   };
@@ -118,12 +107,6 @@ const Settings = () => {
 
   const handleTouchEnd = () => {
     if (isDragging) {
-      const newHistory = [
-        ...dragHistory.slice(0, historyIndex + 1),
-        { ...position },
-      ];
-      setDragHistory(newHistory);
-      setHistoryIndex(newHistory.length - 1);
       setIsDragging(false);
     }
   };
@@ -164,22 +147,6 @@ const Settings = () => {
       }
     }
   }, []);
-
-  // Handle buttons
-  const handleReset = () => {
-    const newPosition = { x: 0, y: 0 };
-    setPosition(newPosition);
-
-    const newHistory = [...dragHistory.slice(0, historyIndex + 1), newPosition];
-    setDragHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-
-    // Reset tone percentages
-    const percentages = calculateTonePercentages(0, 0, sliderRef);
-    if (percentages) {
-      setTonePercentages(percentages);
-    }
-  };
 
   const { setTonePercentage } = useTonePercentage();
   useEffect(() => {
@@ -244,22 +211,6 @@ const Settings = () => {
           <span>Formal: {tonePercentages.formal}%</span>
           <span>Casual: {tonePercentages.casual}%</span>
         </div>
-      </div>
-
-      {/* undo redo */}
-      <div className="flex gap-1 w-full" id="undo-redo">
-        <SettingsButton label="Undo" icon={<Undo />} />
-        <SettingsButton label="redo" icon={<Redo />} />
-      </div>
-
-      {/* reset and copy */}
-      <div className="flex gap-1" id="reset-copy">
-        <SettingsButton
-          label="reset"
-          icon={<RefreshCcw />}
-          onClick={handleReset}
-        />
-        <SettingsButton label="copy" icon={<Copy />} />
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { validateCoreRequest } from "../validator/core.validator.js";
 const router = express.Router()
 
 router.post('/tone-changes', validateCoreRequest, toneChanger)
+
 export default router
 /**
  * @swagger

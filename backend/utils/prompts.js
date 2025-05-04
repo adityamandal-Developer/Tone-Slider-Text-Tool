@@ -10,7 +10,7 @@ export const messagesWithTones = (tone) => {
         },
         {
             role: "user",
-            content: `make this ${tone}`
+            content: `make this Text : ${tone}`
         }
     ]
 }
