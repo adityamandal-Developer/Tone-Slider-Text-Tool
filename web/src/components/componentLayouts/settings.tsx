@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 import SettingsButton from "../ui/settings-button";
 import { Copy, Dot, Redo, RefreshCcw, Undo } from "lucide-react";
 import { useTonePercentage } from "./text-editor-layout";
+import { calculateTonePercentages } from "@/lib/calculateTone";
 
 const Settings = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -22,73 +23,7 @@ const Settings = () => {
   const sliderRef = useRef<HTMLDivElement>(null);
 
   // Calculate tone percentages based on position
-  const calculateTonePercentages = (x: number, y: number) => {
-    if (!sliderRef.current) return;
-
-    const slider = sliderRef.current;
-    const rect = slider.getBoundingClientRect();
-
-    // Normalize position to values between 0 and 1
-    const normalizedX = x / rect.width;
-    const normalizedY = y / rect.height;
-
-    const professionalPos = { x: 0.5, y: 0 }; // top center
-    const creativePos = { x: 1, y: 0.5 }; // right middle
-    const formalPos = { x: 0, y: 0.5 }; // left middle
-    const casualPos = { x: 0.5, y: 1 }; // bottom center
-
-    const professionalDist =
-      1 /
-      (Math.pow(normalizedX - professionalPos.x, 2) +
-        Math.pow(normalizedY - professionalPos.y, 2) +
-        0.01);
-    const creativeDist =
-      1 /
-      (Math.pow(normalizedX - creativePos.x, 2) +
-        Math.pow(normalizedY - creativePos.y, 2) +
-        0.01);
-    const formalDist =
-      1 /
-      (Math.pow(normalizedX - formalPos.x, 2) +
-        Math.pow(normalizedY - formalPos.y, 2) +
-        0.01);
-    const casualDist =
-      1 /
-      (Math.pow(normalizedX - casualPos.x, 2) +
-        Math.pow(normalizedY - casualPos.y, 2) +
-        0.01);
-
-    // Sum of all weights
-    const totalDist = professionalDist + creativeDist + formalDist + casualDist;
-
-    // Calculate percentages (0-100)
-    const professional = Math.round((professionalDist / totalDist) * 100);
-    const creative = Math.round((creativeDist / totalDist) * 100);
-    const formal = Math.round((formalDist / totalDist) * 100);
-    const casual = Math.round((casualDist / totalDist) * 100);
-
-    // Ensure total is exactly 100%
-    const total = professional + creative + formal + casual;
-    const adjustment = 100 - total;
-
-    // Adjust values to sum is 100%
-    const adjustedValues = {
-      professional,
-      creative,
-      formal,
-      casual,
-    };
-
-    // Apply adjustment to the largest value
-    const max = Math.max(professional, creative, formal, casual);
-    if (max === professional) adjustedValues.professional += adjustment;
-    else if (max === creative) adjustedValues.creative += adjustment;
-    else if (max === formal) adjustedValues.formal += adjustment;
-    else adjustedValues.casual += adjustment;
-
-    return adjustedValues;
-  };
-
+  // const calculateTonePercentages = calculateTonePercentages
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -111,7 +46,7 @@ const Settings = () => {
     setPosition({ x: newX, y: newY });
 
     // Calculate and update tone percentages
-    const percentages = calculateTonePercentages(newX, newY);
+    const percentages = calculateTonePercentages(newX, newY, sliderRef);
     if (percentages) {
       setTonePercentages(percentages);
     }
@@ -150,7 +85,7 @@ const Settings = () => {
       setPosition({ x: newX, y: newY });
 
       // Calculate and update tone percentages
-      const percentages = calculateTonePercentages(newX, newY);
+      const percentages = calculateTonePercentages(newX, newY, sliderRef);
       if (percentages) {
         setTonePercentages(percentages);
       }
@@ -175,7 +110,7 @@ const Settings = () => {
     setPosition({ x: newX, y: newY });
 
     // Calculate and update tone percentages
-    const percentages = calculateTonePercentages(newX, newY);
+    const percentages = calculateTonePercentages(newX, newY, sliderRef);
     if (percentages) {
       setTonePercentages(percentages);
     }
@@ -219,7 +154,11 @@ const Settings = () => {
   // Initialize tone percentages on component mount
   useEffect(() => {
     if (sliderRef.current) {
-      const percentages = calculateTonePercentages(position.x, position.y);
+      const percentages = calculateTonePercentages(
+        position.x,
+        position.y,
+        sliderRef
+      );
       if (percentages) {
         setTonePercentages(percentages);
       }
@@ -236,55 +175,9 @@ const Settings = () => {
     setHistoryIndex(newHistory.length - 1);
 
     // Reset tone percentages
-    const percentages = calculateTonePercentages(0, 0);
+    const percentages = calculateTonePercentages(0, 0, sliderRef);
     if (percentages) {
       setTonePercentages(percentages);
-    }
-  };
-
-  const handleCopy = () => {
-    const coordinates = `x: ${Math.round(position.x)}, y: ${Math.round(
-      position.y
-    )}`;
-    navigator.clipboard
-      .writeText(coordinates)
-      .then(() => console.log("Coordinates copied to clipboard"))
-      .catch((err) => console.error("Failed to copy coordinates", err));
-  };
-
-  const handleUndo = () => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      const newPosition = dragHistory[newIndex];
-      setPosition(newPosition);
-
-      // Update tone percentages for the new position
-      const percentages = calculateTonePercentages(
-        newPosition.x,
-        newPosition.y
-      );
-      if (percentages) {
-        setTonePercentages(percentages);
-      }
-    }
-  };
-
-  const handleRedo = () => {
-    if (historyIndex < dragHistory.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      const newPosition = dragHistory[newIndex];
-      setPosition(newPosition);
-
-      // Update tone percentages for the new position
-      const percentages = calculateTonePercentages(
-        newPosition.x,
-        newPosition.y
-      );
-      if (percentages) {
-        setTonePercentages(percentages);
-      }
     }
   };
 
