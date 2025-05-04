@@ -1,5 +1,10 @@
 # Project Setup and Execution Guide
 
+## Documentations 
+- [Working with Mistral](https://github.com/adityamandal-Developer/Tone-Slider-Text-Tool/blob/main/backend_with_mistralapi.md)
+- [Undo Redo functionality](https://github.com/adityamandal-Developer/Tone-Slider-Text-Tool/blob/main/undo_redo.md)
+- [Error handling](https://github.com/adityamandal-Developer/Tone-Slider-Text-Tool/blob/main/error_handling.md)
+  
 This document provides instructions on how to set up and run both the backend and web components of this project, utilizing `.env` files for environment variable configuration.
 
 ## Folder Structure
