@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import { Dot } from "lucide-react";
+import { Dot, RefreshCcw } from "lucide-react";
 import { useTonePercentage } from "./text-editor-layout";
 import { calculateTonePercentages } from "@/lib/calculateTone";
 
@@ -153,6 +153,17 @@ const Settings = () => {
     const toneString = `${tonePercentages.professional}% professional, ${tonePercentages.creative}% creative, ${tonePercentages.formal}% formal, ${tonePercentages.casual}% casual`;
     setTonePercentage(toneString);
   }, [tonePercentages, setTonePercentage]);
+
+  const handleReset = () => {
+    const newPosition = { x: 0, y: 0 };
+    setPosition(newPosition);
+
+    // Reset tone percentages
+    const percentages = calculateTonePercentages(0, 0, sliderRef);
+    if (percentages) {
+      setTonePercentages(percentages);
+    }
+  };
   return (
     <div className="w-full h-full lg:w-1/3 p-2 flex flex-col gap-1">
       {/* slider */}
@@ -188,7 +199,12 @@ const Settings = () => {
           <div className="flex items-center justify-center w-full border border-ring text-center text-wrap">
             Formal
           </div>
-          <div className="flex items-center justify-center w-full border border-ring text-center"></div>
+          <div
+            className="flex items-center justify-center w-full border border-ring text-center text-accent z-50"
+            onClick={handleReset}
+          >
+            <RefreshCcw />
+          </div>
           <div className="flex items-center justify-center w-full border border-ring text-center text-wrap">
             Creative
           </div>
