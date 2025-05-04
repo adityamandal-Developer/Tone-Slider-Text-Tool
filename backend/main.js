@@ -47,7 +47,7 @@ app.use("/api/v1", textTone)
 
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(chalk.cyan(`Server is running on PORT ${PORT} 🚀`))
 })
 
